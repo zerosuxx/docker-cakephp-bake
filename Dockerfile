@@ -20,18 +20,18 @@ RUN rm -f /etc/localtime \
     && echo "log_errors = On" >> /usr/local/etc/php/php.ini \
     && echo "error_log = /dev/stderr" >> /usr/local/etc/php/php.ini \
     && echo "date.timezone = 'Europe/Budapest'" >> /usr/local/etc/php/php.ini \
-    && echo "upload_max_filesize = 100M" >> /usr/local/etc/php/php.ini \
-    && echo "post_max_size = 100M" >> /usr/local/etc/php/php.ini \
     && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
     && composer create-project --prefer-dist cakephp/app /var/www/html \
     && chmod +x /var/www/html/bin/cake \
     && mkdir /var/www/html/src/Shell/Task
 
+# Copy custom task
 COPY ZeroModelTask.php /var/www/html/src/Shell/Task/
     
 # Define workspace
 WORKDIR /var/www/html
 
+# Define entrypoint
 ENTRYPOINT ["/var/www/html/bin/cake", "bake"]
 
 
