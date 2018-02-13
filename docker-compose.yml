@@ -1,0 +1,7 @@
+version: '2'
+services:
+  cakebake:
+    build: .
+    image: zerosuxx/docker-cakephp-bake:latest
+    environment:
+      DATABASE_URL: "mysql://root:@localhost/app?encoding=utf8&timezone=UTC&cacheMetadata=false&quoteIdentifiers=false&persistent=false"
