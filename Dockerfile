@@ -1,4 +1,4 @@
-# All rights reserved © 2017 Zero
+# All rights reserved © 2018 Zero
 FROM php:7.2.2
 MAINTAINER Mohos Tamas <tomi@mohos.name>
 
