@@ -23,7 +23,8 @@ RUN rm -f /etc/localtime \
     && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
     && composer create-project --prefer-dist cakephp/app /var/www/html \
     && chmod +x /var/www/html/bin/cake \
-    && mkdir /var/www/html/src/Shell/Task
+    && mkdir /var/www/html/src/Shell/Task \
+    && chmod -R 777 /var/www/html/
 
 # Copy custom task
 COPY ZeroModelTask.php /var/www/html/src/Shell/Task/
