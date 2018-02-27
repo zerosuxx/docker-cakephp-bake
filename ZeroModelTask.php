@@ -51,8 +51,6 @@ class ZeroModelTask extends ModelTask {
 
             ]);
         }
-        shell_exec('chmod -R 777 ' . $path . 'Entity');
-        shell_exec('chmod -R 777 ' . $path . 'Table');
     }
     
     public function createFile($filename, $out) {
