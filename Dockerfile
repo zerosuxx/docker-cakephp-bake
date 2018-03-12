@@ -33,7 +33,7 @@ COPY ZeroModelTask.php /var/www/html/src/Shell/Task/
 WORKDIR /var/www/html
 
 # Define entrypoint
-ENTRYPOINT ["/var/www/html/bin/cake", "bake"]
+ENTRYPOINT ["/var/www/html/bin/cake"]
 
 
 
