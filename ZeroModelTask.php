@@ -4,6 +4,7 @@ namespace App\Shell\Task;
 
 use Bake\Shell\Task\ModelTask;
 use Cake\Core\Configure;
+use Cake\ORM\Table;
 
 class ZeroModelTask extends ModelTask {
     const VERSION = 1.04;
@@ -67,8 +68,33 @@ class ZeroModelTask extends ModelTask {
             $newOut = preg_replace('|\* \@.*\*/|Us', '*/', $newOut);
             $newOut = preg_replace('|use.*;\n|', '', $newOut);
         }
-;
+
         $createFile = parent::createFile($newFilename, $newOut);
         return $createFile;
+    }
+    
+    public function getAssociations(Table $table) {
+        $associations = parent::getAssociations($table);
+        $aliases = [];
+        foreach($associations as $type => $assocs) {
+            $i = 2;
+            if(!isset($aliases[$type])) {
+                $aliases[$type] = [];
+            }
+            foreach($assocs as $k => $assoc) {
+                if(in_array($assoc['alias'], $aliases[$type])) {
+                    $newAlias = $assoc['alias'] . '_' . $i;
+                    if(!isset($assoc['className'])) {
+                        $assoc['className'] = $assoc['alias'];
+                    }
+                    $assoc['alias'] = $newAlias;
+                    $associations[$type][$k] = $assoc;
+                    $i++;
+                } else {
+                    $aliases[$type][] = $assoc['alias'];
+                }
+            }
+        }
+        return $associations;
     }
 }
