@@ -56,7 +56,7 @@ class ZeroModelTask extends ModelTask {
     
     public function createFile($filename, $out) {
         $tableName = basename($filename, '.php');
-        
+        $isEntity = strpos($filename, 'Entity') !== false;
         $newFilename = str_replace(['/', '\\'], [DS, DS], $filename);
         $newOut = str_replace('class Bake\\', 'class ', $out);
         $isBakeTemplate = $out !== $newOut;
@@ -67,6 +67,9 @@ class ZeroModelTask extends ModelTask {
             $newOut = preg_replace(['/extends (Entity|Table)/'], 'extends Bake\\Bake'.$classMatches[1], $newOut);
             $newOut = preg_replace('|\* \@.*\*/|Us', '*/', $newOut);
             $newOut = preg_replace('|use.*;\n|', '', $newOut);
+            if($isEntity) {
+                $newOut = preg_replace('|({)(.*)(})|Us', "$1\r\n\r\n$3", $newOut);
+            }
         }
 
         $createFile = parent::createFile($newFilename, $newOut);
