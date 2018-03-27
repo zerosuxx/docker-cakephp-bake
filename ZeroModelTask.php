@@ -6,9 +6,16 @@ use Bake\Shell\Task\ModelTask;
 use Cake\Core\Configure;
 use Cake\ORM\Table;
 
+/**
+ * @author Mohos Tamás <tomi@mohos.name>
+ * @package App\Shell\Tas
+ * @version 1.06
+ */
 class ZeroModelTask extends ModelTask {
-    const VERSION = 1.04;
     
+    /**
+     * @var string
+     */
     private $modelNamespace = null;
     
     public function bake($name) {
@@ -22,11 +29,10 @@ class ZeroModelTask extends ModelTask {
         $bakeTableObject = $this->getTableObject($name, $table);
         $tableObject = clone $bakeTableObject;
         $data = $this->getTableContext($bakeTableObject, $table, $name);
-        
+
         $bakeTableObject->setAlias('Bake\\Bake'.$bakeTableObject->getAlias());
         $tableName = $tableObject->getAlias();
         $entityName = $this->_entityName($tableObject->getAlias());
-        $data['extendClass'] = '\Model\Table\AppTable';//'\Model\Entity\AppEntity';
 
         //bake 'BakeTable'
         $this->bakeTable($bakeTableObject, $data);
@@ -62,6 +68,9 @@ class ZeroModelTask extends ModelTask {
                 'use ' . $modelNamespace . '\Entity\AppEntity as Entity;'],
                 $newOut
             );
+            if(!$isEntity) {
+                $newOut = preg_replace('/\\\Entity\\\Bake\\\Bake/', '\\Entity\\', $newOut);
+            }
             $newOut = preg_replace(['/namespace .*(\\Entity)/', '/namespace .*(\\Table)/'], '$0\\Bake', $newOut);
         } else {
             preg_match('/class (.*) /U', $newOut, $classMatches);
