@@ -9,38 +9,33 @@ use Cake\ORM\Table;
 class ZeroModelTask extends ModelTask {
     const VERSION = 1.04;
     
+    private $modelNamespace = null;
+    
     public function bake($name) {
         $path = $this->getPath();
         $namespace = Configure::read('App.namespace');
+        $this->modelNamespace = $namespace . '\Model';
+        //create AppTable & AppEntity
+        $this->createAppTableAndEntity($path);
         
         $table = $this->getTable($name);
         $bakeTableObject = $this->getTableObject($name, $table);
         $tableObject = clone $bakeTableObject;
         $data = $this->getTableContext($bakeTableObject, $table, $name);
         
-        $entityData = $data;
-        $entityData['namespaceSuffix'] = '\Model\Entity\Bake';
-        $entityData['extendClass'] = '\Model\Entity\AppEntity';
-        
         $bakeTableObject->setAlias('Bake\\Bake'.$bakeTableObject->getAlias());
-        $bakeTableName = $bakeTableObject->getAlias();
         $tableName = $tableObject->getAlias();
         $entityName = $this->_entityName($tableObject->getAlias());
-        $bakeEntityName = $this->_entityName($bakeTableName);
-        $data['entity'] = $entityName;
-        $data['uses'] = null;
-        $data['extendClass'] = '\Model\Table\AppTable';
-        $data['namespaceSuffix'] = '\Model\Table\Bake';
+        $data['extendClass'] = '\Model\Table\AppTable';//'\Model\Entity\AppEntity';
 
         //bake 'BakeTable'
         $this->bakeTable($bakeTableObject, $data);
         //bake 'BakeEntity'
-        $this->bakeEntity($bakeTableObject, $entityData);
+        $this->bakeEntity($bakeTableObject, $data);
         
         //bake 'Table'
         $tableFile = $path . 'Table' . DS . $tableName . 'Table.php';
         if(!file_exists($tableFile)) {
-            $bakeTableClass = $namespace.'\\Model\\Table\\'.$bakeTableName.'Table';
             $this->bakeTable($tableObject, [
                 'primaryKey' => false
             ]);
@@ -48,23 +43,29 @@ class ZeroModelTask extends ModelTask {
         //bake 'Entity'
         $entityFile = $path . 'Entity' . DS . $entityName . '.php';
         if(!file_exists($entityFile)) {
-            $this->bakeEntity($tableObject, [
-
-            ]);
+            $this->bakeEntity($tableObject);
         }
     }
     
     public function createFile($filename, $out) {
+        $modelNamespace = $this->modelNamespace;
         $tableName = basename($filename, '.php');
         $isEntity = strpos($filename, 'Entity') !== false;
         $newFilename = str_replace(['/', '\\'], [DS, DS], $filename);
         $newOut = str_replace('class Bake\\', 'class ', $out);
         $isBakeTemplate = $out !== $newOut;
         if($isBakeTemplate) {
+            $newOut = preg_replace(
+                ['/use Cake\\\ORM\\\Table;/',
+                '/use Cake\\\ORM\\\Entity;/'], 
+                ['use ' . $modelNamespace . '\Table\AppTable as Table;',
+                'use ' . $modelNamespace . '\Entity\AppEntity as Entity;'],
+                $newOut
+            );
             $newOut = preg_replace(['/namespace .*(\\Entity)/', '/namespace .*(\\Table)/'], '$0\\Bake', $newOut);
         } else {
             preg_match('/class (.*) /U', $newOut, $classMatches);
-            $newOut = preg_replace(['/extends (Entity|Table)/'], 'extends Bake\\Bake'.$classMatches[1], $newOut);
+            $newOut = preg_replace('/extends (Entity|Table)/', 'extends Bake\\Bake'.$classMatches[1], $newOut);
             $newOut = preg_replace('|\* \@.*\*/|Us', '*/', $newOut);
             $newOut = preg_replace('|use.*;\n|', '', $newOut);
             if($isEntity) {
@@ -99,5 +100,34 @@ class ZeroModelTask extends ModelTask {
             }
         }
         return $associations;
+    }
+    
+    protected function createAppTableAndEntity($path) { 
+        $appTableFile = $path . 'Table' . DS . 'AppTable.php';
+        $appEntityFile = $path . 'Entity' . DS . 'AppEntity.php';
+        if( !file_exists($appTableFile) ) {
+            parent::createFile($appTableFile, 
+            '<?php'."\r\n\r\n" . 
+
+            'namespace ' . $this->modelNamespace . '\Table;' . "\r\n\r\n" .
+
+            'use Cake\ORM\Table;' . "\r\n\r\n" . 
+
+            'class AppTable extends Table {' . "\r\n\r\n" . 
+
+            '}');
+        }
+        if( !file_exists($appEntityFile) ) {
+            parent::createFile($appEntityFile, 
+                '<?php'."\r\n\r\n" . 
+
+                'namespace ' . $this->modelNamespace . '\Entity;' . "\r\n\r\n" .
+
+                'use Cake\ORM\Entity;' . "\r\n\r\n" . 
+
+                'class AppEntity extends Entity {' . "\r\n\r\n" . 
+
+                '}');
+        } 
     }
 }
