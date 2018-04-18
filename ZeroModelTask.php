@@ -78,7 +78,7 @@ class ZeroModelTask extends ModelTask {
             $newOut = preg_replace('|\* \@.*\*/|Us', '*/', $newOut);
             $newOut = preg_replace('|use.*;\n|', '', $newOut);
             if($isEntity) {
-                $newOut = preg_replace('|({)(.*)(})|Us', "$1\r\n\r\n$3", $newOut);
+                $newOut = preg_replace('|({)(.*)(})|Us', "$1\n\n$3", $newOut);
             }
         }
 
@@ -116,25 +116,25 @@ class ZeroModelTask extends ModelTask {
         $appEntityFile = $path . 'Entity' . DS . 'AppEntity.php';
         if( !file_exists($appTableFile) ) {
             parent::createFile($appTableFile, 
-            '<?php'."\r\n\r\n" . 
+            '<?php'."\n\n" . 
 
-            'namespace ' . $this->modelNamespace . '\Table;' . "\r\n\r\n" .
+            'namespace ' . $this->modelNamespace . '\Table;' . "\n\n" .
 
-            'use Cake\ORM\Table;' . "\r\n\r\n" . 
+            'use Cake\ORM\Table;' . "\n\n" . 
 
-            'class AppTable extends Table {' . "\r\n\r\n" . 
+            'class AppTable extends Table {' . "\n\n" . 
 
             '}');
         }
         if( !file_exists($appEntityFile) ) {
             parent::createFile($appEntityFile, 
-                '<?php'."\r\n\r\n" . 
+                '<?php'."\n\n" . 
 
-                'namespace ' . $this->modelNamespace . '\Entity;' . "\r\n\r\n" .
+                'namespace ' . $this->modelNamespace . '\Entity;' . "\n\n" .
 
-                'use Cake\ORM\Entity;' . "\r\n\r\n" . 
+                'use Cake\ORM\Entity;' . "\n\n" . 
 
-                'class AppEntity extends Entity {' . "\r\n\r\n" . 
+                'class AppEntity extends Entity {' . "\n\n" . 
 
                 '}');
         } 
