@@ -82,7 +82,7 @@ class ZeroModelTask extends ModelTask {
             }
         }
 
-        $createFile = parent::createFile($newFilename, $newOut);
+        $createFile = parent::createFile($newFilename, str_replace("\r\n", "\n", $newOut));
         return $createFile;
     }
     
